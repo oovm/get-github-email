@@ -1,3 +1,4 @@
 mod errors;
+mod methods;
 
-pub use errors::{Error, Result};
+pub use errors::{GithubError, Result};
