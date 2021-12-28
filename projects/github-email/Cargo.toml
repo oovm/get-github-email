@@ -1,9 +1,8 @@
 [package]
-name = "sub_projects"
-publish = false
+name = "github-email"
 version = "0.0.0"
 authors = ["Aster <192607617@qq.com>"]
-description = "..."
+description = "Get email from github account"
 repository = "https://github.com/oovm/sub_projects"
 documentation = "https://docs.rs/sub_projects"
 readme = "Readme.md"
@@ -11,6 +10,7 @@ license = "MPL-2.0"
 edition = "2021"
 
 [dependencies]
+reqwest = { version = "0.11.12", features = [] }
 
 [dev-dependencies]
 
