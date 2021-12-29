@@ -1,4 +1,4 @@
-use octocrab::Error;
+use serde_json::Error;
 
 use crate::GithubError;
 

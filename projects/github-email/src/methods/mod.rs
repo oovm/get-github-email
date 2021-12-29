@@ -1,34 +1,19 @@
-use crate::{GithubError, Result};
+use std::{collections::BTreeMap, str::FromStr};
+
 use reqwest::{header::USER_AGENT, Client};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::str::FromStr;
 
-/// https://api.github.com/users/oovm/events/public
-pub async fn from_user_events(user: &str) -> Result<String> {
-    let url = format!("https://api.github.com/users/{user}/events/public");
-    let out = Client::new().get(url).header(USER_AGENT, "Octocat").send().await?;
-    let text = out.text().await?;
-    let value = Value::from_str(&text)?;
-    let first = match &value {
-        Value::Array(v) => match v.get(0).and_then(|v| v.as_object()) {
-            Some(s) => s,
-            None => return Err(GithubError::RuntimeError(format!("User {user} had no public activity."))),
-        },
-        Value::Object(_) => {
-            todo!("{:#?}", value)
-        }
-        _ => return Err(GithubError::RuntimeError(format!("Unknown response when call from_user_events: {text}"))),
-    };
-    println!("{:#?}", first);
-    Ok(String::new())
-}
+use crate::{GithubError, Result};
 
-/// https://api.github.com/users/oovm/events/public
-pub async fn get_events2() -> Result<()> {
-    let pr = octocrab::instance().events().send().await?;
-    println!("{:#?}", pr);
-    Ok(())
+pub mod by_network_events;
+pub mod by_user_events;
+
+fn read_commit(commit: &Value) -> Option<CommitAuthor> {
+    let author = commit.as_object()?.get("author")?.as_object()?;
+    let name = author.get("name")?.as_str()?.to_string();
+    let email = author.get("email")?.as_str()?.to_string();
+    Some(CommitAuthor { name, email, count: 1 })
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -37,7 +22,29 @@ pub struct EventsResponse {
     pub documentation_url: String,
 }
 
-#[tokio::test]
-async fn test() {
-    from_user_events("oovm").await.unwrap();
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CommitAuthor {
+    name: String,
+    email: String,
+    count: usize,
+}
+
+#[derive(Default, Debug, Serialize, Deserialize)]
+pub struct Authors {
+    inner: BTreeMap<String, CommitAuthor>,
+}
+
+impl Authors {
+    pub fn get(&self, name: &str) -> Option<&CommitAuthor> {
+        self.inner.get(name)
+    }
+    pub fn insert(&mut self, author: CommitAuthor) {
+        match self.inner.get_mut(&author.name) {
+            Some(s) => s.count += author.count,
+            None => self.insert_new(author),
+        }
+    }
+    fn insert_new(&mut self, author: CommitAuthor) {
+        self.inner.insert(author.name.clone(), author);
+    }
 }
