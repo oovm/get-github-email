@@ -8,7 +8,7 @@ pub async fn collect_network_events(owner: &str, repo: &str, authors: &mut Autho
     let out = Client::new().get(url).header(USER_AGENT, "octocat").send().await?;
     let text = out.text().await?;
     let value = Value::from_str(&text)?;
-    println!("{value:#?}");
+
     match &value {
         Value::Array(events) => {
             for event in events {
@@ -23,16 +23,4 @@ pub async fn collect_network_events(owner: &str, repo: &str, authors: &mut Autho
         _ => {}
     };
     Err(GithubError::RuntimeError(format!("Unknown response when call from_user_events: {text}")))
-}
-
-fn read_payload(event: &Value, count: &mut Authors) -> Option<()> {
-    let payload = event.as_object()?.get("payload")?.as_object()?;
-    let commits = payload.get("commits")?.as_array()?;
-    for commit in commits {
-        match read_commit(commit) {
-            Some(s) => count.insert(s),
-            None => continue,
-        }
-    }
-    Some(())
 }
