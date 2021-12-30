@@ -2,9 +2,20 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
+use crate::{collect_repo_events, collect_user_events, Result};
+
+pub mod query;
+
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct Authors {
     inner: BTreeMap<String, CommitAuthor>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum AuthorQuery {
+    Nothing,
+    User(String),
+    Repo(String, String),
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -24,6 +35,7 @@ impl Authors {
             None => self.insert_new(author),
         }
     }
+
     fn insert_new(&mut self, author: CommitAuthor) {
         self.inner.insert(author.name.clone(), author);
     }

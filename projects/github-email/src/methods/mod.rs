@@ -8,6 +8,7 @@ use crate::{Authors, CommitAuthor, GithubError, Result};
 pub mod by_network_events;
 pub mod by_repo_events;
 pub mod by_user_events;
+pub mod for_url_dispatch;
 
 fn read_payload(event: &Value, count: &mut Authors) -> Option<()> {
     let payload = event.as_object()?.get("payload")?.as_object()?;
