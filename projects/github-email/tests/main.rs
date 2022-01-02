@@ -1,14 +1,20 @@
-use github_email::{collect_network_events, collect_user_events, Authors};
-
 #[test]
 fn ready() {
     println!("it works!")
 }
 
 #[tokio::test]
-async fn test() {
+async fn find_email() {
+    use github_email::{parse_queries, Authors};
     let mut authors = Authors::default();
-    collect_user_events("oovm", &mut authors).await.unwrap();
-    collect_network_events("oovm", "get-github-email", &mut authors).await.unwrap();
+    let url = r#"
+    https://github.com/oovm/
+    https://github.com/oovm/get-github-email
+    "#;
+    for query in parse_queries(url) {
+        if let Err(e) = authors.query(query).await {
+            eprintln!("{e}")
+        }
+    }
     println!("{authors:#?}")
 }
