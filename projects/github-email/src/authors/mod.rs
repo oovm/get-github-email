@@ -15,7 +15,7 @@ pub struct Authors {
     inner: BTreeMap<String, CommitAuthor>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum AuthorQuery {
     Nothing,
     User(String),
@@ -44,8 +44,7 @@ impl Authors {
     }
     pub fn items(&self) -> Vec<&CommitAuthor> {
         let mut by_name: Vec<_> = self.into_iter().collect();
-
-        by_name.sort_by_key(|f| f.count);
+        by_name.sort_by_key(|f| -(f.count as isize));
         by_name
     }
 }

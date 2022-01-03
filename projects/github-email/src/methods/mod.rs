@@ -1,4 +1,4 @@
-use std::str::FromStr;
+use std::{collections::HashSet, str::FromStr};
 
 use reqwest::{header::USER_AGENT, Client};
 use serde_json::Value;
@@ -28,12 +28,12 @@ fn read_commit(commit: &Value) -> Option<CommitAuthor> {
     Some(CommitAuthor { name, email, count: 1 })
 }
 
-pub fn parse_queries(urls: &str) -> Vec<AuthorQuery> {
-    let mut out = vec![];
+pub fn parse_queries(urls: &str) -> HashSet<AuthorQuery> {
+    let mut out = HashSet::default();
     for x in urls.lines() {
         let query = AuthorQuery::from(x);
         if query.is_some() {
-            out.push(query)
+            out.insert(query);
         }
     }
     out
