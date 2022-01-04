@@ -1,0 +1,29 @@
+[package]
+name = "github-email-web"
+publish = false
+version = "0.0.0"
+authors = ["Aster <192607617@qq.com>"]
+description = "Get email from github account"
+repository = "https://github.com/oovm/sub_projects"
+documentation = "https://docs.rs/sub_projects"
+readme = "Readme.md"
+license = "MPL-2.0"
+edition = "2021"
+
+[dependencies]
+wasm-logger = "0.2.0"
+log = "0.4.6"
+
+[dependencies.dioxus]
+version = "0.2.4"
+features = ["web", "ssr"]
+
+[dependencies.github-email]
+version = "0.0.0"
+path = "../github-email"
+
+[dev-dependencies]
+tokio = { version = "1.21.2", features = ["full"] }
+
+[features]
+default = []
