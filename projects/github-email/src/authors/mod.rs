@@ -1,8 +1,11 @@
 use std::{
-    collections::{btree_map::Values, BTreeMap},
+    collections::BTreeMap,
     fmt::{Debug, Display, Formatter},
+    iter::Rev,
+    vec::IntoIter,
 };
 
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -43,9 +46,10 @@ impl Authors {
         self.inner.insert(author.name.clone(), author);
     }
     pub fn items(&self) -> Vec<&CommitAuthor> {
-        let mut by_name: Vec<_> = self.into_iter().collect();
-        by_name.sort_by_key(|f| -(f.count as isize));
-        by_name
+        self.into_iter().collect()
+    }
+    pub fn count_commits(&self) -> usize {
+        self.inner.iter().map(|v| v.1.count).sum()
     }
 }
 
@@ -62,9 +66,9 @@ impl Display for Authors {
 
 impl<'i> IntoIterator for &'i Authors {
     type Item = &'i CommitAuthor;
-    type IntoIter = Values<'i, String, CommitAuthor>;
+    type IntoIter = Rev<IntoIter<&'i CommitAuthor>>;
 
     fn into_iter(self) -> Self::IntoIter {
-        self.inner.values()
+        self.inner.values().sorted_by_key(|v| v.count).rev()
     }
 }
