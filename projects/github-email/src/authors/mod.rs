@@ -25,7 +25,7 @@ pub enum AuthorQuery {
     Repo(String, String),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct CommitAuthor {
     pub name: String,
     pub email: String,
@@ -33,6 +33,9 @@ pub struct CommitAuthor {
 }
 
 impl Authors {
+    pub fn clear(&mut self) {
+        self.inner.clear()
+    }
     pub fn get(&self, name: &str) -> Option<&CommitAuthor> {
         self.inner.get(name)
     }
@@ -45,8 +48,8 @@ impl Authors {
     pub fn insert_force(&mut self, author: CommitAuthor) {
         self.inner.insert(author.name.clone(), author);
     }
-    pub fn items(&self) -> Vec<&CommitAuthor> {
-        self.into_iter().collect()
+    pub fn items(&self) -> Vec<CommitAuthor> {
+        self.into_iter().cloned().collect()
     }
     pub fn count_commits(&self) -> usize {
         self.inner.iter().map(|v| v.1.count).sum()

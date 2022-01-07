@@ -1,4 +1,5 @@
 use super::*;
+use crate::{parse_queries, GithubError};
 
 impl Authors {
     pub async fn query<Q>(&mut self, query: Q) -> Result<()>
@@ -11,6 +12,15 @@ impl Authors {
             AuthorQuery::Repo(user, repo) => collect_repo_events(&user, &repo, self).await?,
         }
         Ok(())
+    }
+    pub async fn query_many(&mut self, queries: &str) -> Vec<GithubError> {
+        let mut errors = vec![];
+        for query in parse_queries(queries) {
+            if let Err(e) = self.query(query).await {
+                errors.push(e)
+            }
+        }
+        errors
     }
 }
 
