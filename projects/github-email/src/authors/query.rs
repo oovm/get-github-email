@@ -1,5 +1,8 @@
-use super::*;
+use log::info;
+
 use crate::{parse_queries, GithubError};
+
+use super::*;
 
 impl Authors {
     pub async fn query<Q>(&mut self, query: Q) -> Result<()>
@@ -16,6 +19,7 @@ impl Authors {
     pub async fn query_many(&mut self, queries: &str) -> Vec<GithubError> {
         let mut errors = vec![];
         for query in parse_queries(queries) {
+            info!("Query: {query:?}");
             if let Err(e) = self.query(query).await {
                 errors.push(e)
             }

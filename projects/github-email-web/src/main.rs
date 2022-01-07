@@ -1,32 +1,18 @@
 #![allow(non_snake_case)]
 
-use std::{cell::RefCell, future::Future, rc::Rc, sync::Arc};
+use std::{cell::RefCell, rc::Rc, sync::Arc};
 
 use dioxus::{
-    core::UiEvent,
-    events::{FormData, MouseEvent},
+    events::{FormEvent, MouseEvent},
     prelude::*,
 };
-use log::{error, info};
+use log::error;
 
 use github_email::Authors;
-
-// use rsx_platform_free::Editor;
 
 fn main() {
     wasm_logger::init(wasm_logger::Config::default());
     dioxus::web::launch(AppWeb)
-}
-
-pub trait UseStatePatch<T> {
-    fn set_async(&self, cx: &ScopeState, future: impl Future<Output = T> + 'static);
-}
-
-impl<T> UseStatePatch<T> for UseState<T> {
-    fn set_async(&self, cx: &ScopeState, future: impl Future<Output = T> + 'static) {
-        let my_state = self.clone();
-        cx.spawn(async move { my_state.set(future.await) })
-    }
 }
 
 pub fn main_ssr() {
@@ -36,20 +22,22 @@ pub fn main_ssr() {
 }
 
 pub fn AppWeb(cx: Scope) -> Element {
-    let place_holder = r#"https://github.com/oovm"#;
+    let place_holder = "https://github.com/{user}\nhttps://github.com/{user}/{repo}";
     let github_issue = "https://github.com/oovm/get-github-email/issues";
-    let authors = use_authors(&cx, place_holder);
+    let authors = use_authors(&cx);
+
     let text = authors.get_text();
+    let authors_table = authors.view();
 
     let on_input = {
         let handler = authors.clone();
-        move |e| handler.set_text(e)
+        move |e: FormEvent| handler.set_text(&e.value)
     };
-    let future = {
+    let on_click = {
         let handler = authors.clone();
-        use_future(&cx, (), |_| async move { handler.click_query().await })
+        let future = use_future(&cx, (), |_| async move { handler.click_query().await });
+        move |_: MouseEvent| future.restart()
     };
-    let authors_table = authors.view();
     cx.render(rsx!(
         div {
             // class: "flex",
@@ -68,7 +56,7 @@ pub fn AppWeb(cx: Scope) -> Element {
                 button {
                     class: "py-2 px-4 mr-2 mb-2 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700",
                     r#type: "button",
-                    onclick: move |_: MouseEvent| future.restart(),
+                    onclick: on_click,
                     "Find Emails"
                 }
                 a {
@@ -94,9 +82,9 @@ pub struct UseAuthors {
 }
 
 /// A builder for a [`UseKatex`] hook.
-pub fn use_authors<'a>(cx: &'a ScopeState, place_holder: &str) -> &'a mut UseAuthors {
+pub fn use_authors(cx: &ScopeState) -> &mut UseAuthors {
     let authors = UseAuthors {
-        urls: Rc::new(RefCell::new(place_holder.to_string())),
+        urls: Rc::new(RefCell::new(Default::default())),
         authors: Rc::new(RefCell::new(Default::default())),
         updater: cx.schedule_update(),
     };
@@ -111,11 +99,14 @@ impl UseAuthors {
     pub fn get_text(&self) -> String {
         self.urls.borrow().to_string()
     }
-    pub fn set_text(&self, e: UiEvent<FormData>) {
-        *self.urls.borrow_mut() = e.value.to_owned()
+    pub fn set_text<S>(&self, s: S)
+    where
+        S: Into<String>,
+    {
+        *self.urls.borrow_mut() = s.into();
+        self.needs_update()
     }
     pub async fn click_query(&self) {
-        info!("requesting");
         let urls = self.urls.borrow();
         let errors = self.authors.borrow_mut().query_many(urls.as_str()).await;
         for e in errors {
