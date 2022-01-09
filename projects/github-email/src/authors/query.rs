@@ -39,7 +39,11 @@ impl AuthorQuery {
 
 impl From<&str> for AuthorQuery {
     fn from(value: &str) -> Self {
-        match Url::parse(value) {
+        let url = match value.contains("://") {
+            true => value.to_string(),
+            false => format!("https://github.com/{value}"),
+        };
+        match Url::parse(&url) {
             Ok(o) => AuthorQuery::from(&o),
             Err(_) => AuthorQuery::Nothing,
         }
@@ -49,6 +53,7 @@ impl From<&str> for AuthorQuery {
 impl From<&Url> for AuthorQuery {
     fn from(value: &Url) -> Self {
         let path = value.path().split("/").collect::<Vec<_>>();
+        // println!("{:?} => {:?}", path, path_slice(&path));
         match path_slice(&path) {
             [user] => AuthorQuery::User(user.to_string()),
             [user, repo, ..] => AuthorQuery::Repo(user.to_string(), repo.to_string()),
@@ -66,16 +71,12 @@ fn path_slice<'v, 's>(path: &'v [&'s str]) -> &'v [&'s str] {
             false => break,
         }
     }
-    for rs in path {
+    for rs in path.iter().rev() {
         match rs.is_empty() {
             true => r -= 1,
             false => break,
         }
     }
+    // println!("{}..{}", l, r);
     &path[l..r]
-}
-
-#[test]
-fn test() {
-    println!("{:#?}", AuthorQuery::from("https://github.com/oovm/get-github-email"))
 }

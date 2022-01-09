@@ -1,6 +1,19 @@
+use github_email::AuthorQuery;
+
 #[test]
 fn ready() {
     println!("it works!")
+}
+
+#[test]
+fn user_query() {
+    let target = AuthorQuery::User("oovm".to_string());
+    assert_eq!(AuthorQuery::from("oovm"), target);
+    assert_eq!(AuthorQuery::from("/oovm"), target);
+    assert_eq!(AuthorQuery::from("oovm/"), target);
+    assert_eq!(AuthorQuery::from("/oovm/"), target);
+    assert_eq!(AuthorQuery::from("https://github.com/oovm"), target);
+    assert_eq!(AuthorQuery::from("https://github.com/oovm/"), target);
 }
 
 #[tokio::test]

@@ -22,7 +22,7 @@ pub fn main_ssr() {
 }
 
 pub fn AppWeb(cx: Scope) -> Element {
-    let place_holder = "https://github.com/{user}\nhttps://github.com/{user}/{repo}";
+    let place_holder = "/{user}\nhttps://github.com/{user}\nhttps://github.com/{user}/{repo}";
     let github_issue = "https://github.com/oovm/get-github-email/issues";
     let authors = use_authors(&cx);
 
