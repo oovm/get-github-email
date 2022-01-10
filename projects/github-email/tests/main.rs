@@ -16,6 +16,17 @@ fn user_query() {
     assert_eq!(AuthorQuery::from("https://github.com/oovm/"), target);
 }
 
+#[test]
+fn repo_query() {
+    let target = AuthorQuery::Repo("oovm".to_string(), "get-github-email".to_string());
+    assert_eq!(AuthorQuery::from("oovm/get-github-email"), target);
+    assert_eq!(AuthorQuery::from("/oovm/get-github-email"), target);
+    assert_eq!(AuthorQuery::from("oovm/get-github-email/"), target);
+    assert_eq!(AuthorQuery::from("/oovm/get-github-email/"), target);
+    assert_eq!(AuthorQuery::from("https://github.com/oovm/get-github-email"), target);
+    assert_eq!(AuthorQuery::from("https://github.com/oovm/get-github-email/"), target);
+}
+
 #[tokio::test]
 async fn find_email() {
     use github_email::{parse_queries, Authors};

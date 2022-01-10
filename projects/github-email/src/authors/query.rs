@@ -78,5 +78,5 @@ fn path_slice<'v, 's>(path: &'v [&'s str]) -> &'v [&'s str] {
         }
     }
     // println!("{}..{}", l, r);
-    &path[l..r]
+    if l > r { path } else { &path[l..r] }
 }
