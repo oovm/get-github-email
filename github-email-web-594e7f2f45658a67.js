@@ -1057,19 +1057,19 @@ imports.wbg.__wbg_textContent_77bd294928962f93 = function(arg0, arg1) {
     getInt32Memory0()[arg0 / 4 + 1] = len0;
     getInt32Memory0()[arg0 / 4 + 0] = ptr0;
 };
-imports.wbg.__wbindgen_closure_wrapper521 = function(arg0, arg1, arg2) {
+imports.wbg.__wbindgen_closure_wrapper523 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 32, __wbg_adapter_24);
     return addHeapObject(ret);
 };
-imports.wbg.__wbindgen_closure_wrapper525 = function(arg0, arg1, arg2) {
+imports.wbg.__wbindgen_closure_wrapper527 = function(arg0, arg1, arg2) {
     const ret = makeClosure(arg0, arg1, 32, __wbg_adapter_27);
     return addHeapObject(ret);
 };
-imports.wbg.__wbindgen_closure_wrapper541 = function(arg0, arg1, arg2) {
+imports.wbg.__wbindgen_closure_wrapper543 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 32, __wbg_adapter_30);
     return addHeapObject(ret);
 };
-imports.wbg.__wbindgen_closure_wrapper1437 = function(arg0, arg1, arg2) {
+imports.wbg.__wbindgen_closure_wrapper1436 = function(arg0, arg1, arg2) {
     const ret = makeMutClosure(arg0, arg1, 32, __wbg_adapter_33);
     return addHeapObject(ret);
 };
@@ -1107,7 +1107,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('github-email-web-43d9ca144b84b38c_bg.wasm', import.meta.url);
+        input = new URL('github-email-web-594e7f2f45658a67_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
