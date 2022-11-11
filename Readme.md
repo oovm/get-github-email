@@ -12,7 +12,9 @@ https://docs.github.com/en/rest/activity/events
 
 ### Rust
 
-
+```bash
+github-email = "*"
+```
 
 
 ```rust

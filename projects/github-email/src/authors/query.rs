@@ -1,5 +1,3 @@
-use log::info;
-
 use crate::{parse_queries, GithubError};
 
 use super::*;
@@ -19,7 +17,7 @@ impl Authors {
     pub async fn query_many(&mut self, queries: &str) -> Vec<GithubError> {
         let mut errors = vec![];
         for query in parse_queries(queries) {
-            info!("Query: {query:?}");
+            // info!("Query: {query:?}");
             if let Err(e) = self.query(query).await {
                 errors.push(e)
             }
@@ -78,5 +76,5 @@ fn path_slice<'v, 's>(path: &'v [&'s str]) -> &'v [&'s str] {
         }
     }
     // println!("{}..{}", l, r);
-    if l > r { path } else { &path[l..r] }
+    if l > r { &[] } else { &path[l..r] }
 }
