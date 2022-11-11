@@ -1107,7 +1107,7 @@ function initSync(module) {
 
 async function init(input) {
     if (typeof input === 'undefined') {
-        input = new URL('github-email-web-a436ad4060517cf5_bg.wasm', import.meta.url);
+        input = new URL('github-email-web-43d9ca144b84b38c_bg.wasm', import.meta.url);
     }
     const imports = getImports();
 
